@@ -28,10 +28,13 @@ def main(topic):
         "WS-US-Business": "https://feeds.content.dowjones.io/public/rss/WSJcomUSBusiness",
         "WS-Economy": "https://feeds.content.dowjones.io/public/rss/socialeconomyfeed",
         "NY-Times": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
-        "Google-News": "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en"
+        "Google-News": "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en",
+        "Fortune": "https://fortune.com/feed/fortune-feeds/?id=3230629",
+        "Business-Standard": "https://www.business-standard.com/rss/latest.rss"
     }
 
     score = 0
+    num_news = 0
 
     positives = []
     negatives = []
@@ -40,32 +43,35 @@ def main(topic):
     print("Searching...")
 
     for source, url in rss_feeds.items():
+        print("Now analyzing " + source)
         feed = feedparser.parse(url)
         for entry in feed.entries:
             if topic in entry.title:
                 predicted_sentiment = predict_sentiment(entry.title)
+                num_news += 1
                 if predicted_sentiment == 'positive' and entry.title not in positives:
-                    positives.append(entry.title + " - " + source)
+                    positives.append(entry.title + " - " + source + "\nlink: " + entry.link + "\n")
                     score += 1
                 elif predicted_sentiment == 'negative' and entry.title not in negatives:
-                    negatives.append(entry.title + " - " + source)
+                    negatives.append(entry.title + " - " + source + "\nlink: " + entry.link + "\n")
                     score -= 1
                 elif entry.title not in neutrals:
-                    neutrals.append(entry.title + " - " + source)
-    
+                    neutrals.append(entry.title + " - " + source + "\nlink: " + entry.link + "\n")
+
     if len(positives) == 0 and len(negatives) == 0 and len(neutrals) == 0:
         print("No new data for now")
     else:
-        print("\nPositive news")
-        for news in positives:
-            print(news)
-        print("\nNegative news")
-        for news in negatives:
-            print(news)
-        print("\nNeutral news")
-        for news in neutrals:
-            print(news)
-        print("Overall score: " + str(score))
+        with open("report.txt", "a") as file:
+            file.write("Report for " + topic + "\nPositive news\n")
+            for news in positives:
+                file.write(news + "\n")
+            file.write("\nNegative news\n")
+            for news in negatives:
+                file.write(news + "\n")
+            file.write("\nNeutral news\n")
+            for news in neutrals:
+                file.write(news + "\n")
+            file.write("\nOverall score: " + str(score / num_news) + "\n\n")
 
 if __name__ == '__main__':
     main(sys.argv[1])

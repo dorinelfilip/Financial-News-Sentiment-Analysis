@@ -9,6 +9,8 @@ __pycache__/
 datasets/
 finbert-finetune/
 env/
+*.ipynb
+weird_format_converter.py
 
 # Distribution / packaging
 .Python
