@@ -3,7 +3,7 @@ from transformers import BertForSequenceClassification, BertTokenizer
 import torch
 import feedparser
 
-model_path = "finbert-finetune"
+model_path = "stefanstanescu03/fin-bert-sentiment-analysis-finetune-v1"
 model = BertForSequenceClassification.from_pretrained(model_path)
 
 tokenizer = BertTokenizer.from_pretrained('yiyanghkust/finbert-pretrain')
