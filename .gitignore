@@ -11,6 +11,7 @@ finbert-finetune/
 env/
 *.ipynb
 weird_format_converter.py
+report.txt
 
 # Distribution / packaging
 .Python
