@@ -1,25 +1,19 @@
-import sys 
-from transformers import BertForSequenceClassification, BertTokenizer
-import torch
+import sys
 import feedparser
+import pickle
 
-model_path = "stefanstanescu03/fin-bert-sentiment-analysis-finetune-v1"
-model = BertForSequenceClassification.from_pretrained(model_path)
-
-tokenizer = BertTokenizer.from_pretrained('yiyanghkust/finbert-pretrain')
+with open("xgb_model.pkl", "rb") as f:
+    vectorizer, model_ml = pickle.load(f)
 
 def predict_sentiment(input_text):
-    inputs = tokenizer(input_text, return_tensors="pt", truncation=True, padding=True)
+    input = vectorizer.transform([input_text])
+    pred = model_ml.predict(input)
 
-    with torch.no_grad():
-        outputs = model(**inputs)
+    label_map = {0: 'neutral', 1: 'positive', 2: 'negative'}
+    
+    return label_map[pred[0]]
 
-    predicted_label = torch.argmax(outputs.logits, dim=1).item()
 
-    label_map = {0: 'negative', 1: 'neutral', 2: 'positive'}
-    predicted_sentiment = label_map[predicted_label]
-
-    return predicted_sentiment
 
 def main(topic):
     rss_feeds = {
@@ -30,12 +24,7 @@ def main(topic):
         "NY-Times": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
         "Google-News": "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en",
         "Fortune": "https://fortune.com/feed/fortune-feeds/?id=3230629",
-        "Business-Standard": "https://www.business-standard.com/rss/latest.rss",
-        "Investing-Company": "https://www.investing.com/rss/news_356.rss",
-        "Investing-Stocks-investing-ideas": "https://www.investing.com/rss/news_1065.rss",
-        "Investing-Stocks": "https://www.investing.com/rss/news_25.rss",
-        "Investing-Economy": "https://www.investing.com/rss/news_14.rss",
-        "Investing-Crypto": "https://www.investing.com/rss/news_301.rss"
+        "Business-Standard": "https://www.business-standard.com/rss/latest.rss"
     }
 
     score = 0
@@ -77,6 +66,7 @@ def main(topic):
             for news in neutrals:
                 file.write(news + "\n")
             file.write("\nOverall score: " + str(score / num_news) + "\n\n")
+
 
 if __name__ == '__main__':
     main(sys.argv[1])
