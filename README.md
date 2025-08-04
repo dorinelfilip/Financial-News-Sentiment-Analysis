@@ -10,3 +10,7 @@ The model have been fine-tuned using [Financial PhraseBank](https://huggingface.
 pip install --no-cache-dir -r requirements.txt
 python .\app.py <your-topic>
 ```
+### API
+```
+fastapi dev api.py
+```
