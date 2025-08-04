@@ -24,7 +24,12 @@ def main(topic):
         "NY-Times": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
         "Google-News": "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en",
         "Fortune": "https://fortune.com/feed/fortune-feeds/?id=3230629",
-        "Business-Standard": "https://www.business-standard.com/rss/latest.rss"
+        "Business-Standard": "https://www.business-standard.com/rss/latest.rss",
+        "Investing-Company": "https://www.investing.com/rss/news_356.rss",
+        "Investing-Stocks-investing-ideas": "https://www.investing.com/rss/news_1065.rss",
+        "Investing-Stocks": "https://www.investing.com/rss/news_25.rss",
+        "Investing-Economy": "https://www.investing.com/rss/news_14.rss",
+        "Investing-Crypto": "https://www.investing.com/rss/news_301.rss"
     }
 
     score = 0
