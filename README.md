@@ -8,9 +8,14 @@ The model have been fine-tuned using [Financial PhraseBank](https://huggingface.
 ### Locally
 ```
 pip install --no-cache-dir -r requirements.txt
-python .\app.py <your-topic>
+python .\app.py <results_destination> <subject>
 ```
 ### API
 ```
 fastapi dev api.py
+```
+### Docker container
+```
+docker build -t news-aggregator .
+docker run --rm -v ${PWD}/<local_output_folder>:/app/output news-aggregator <subject> output/<output_filename>
 ```

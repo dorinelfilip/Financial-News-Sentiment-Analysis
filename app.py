@@ -21,7 +21,7 @@ def predict_sentiment(input_text):
 
     return predicted_sentiment
 
-def main(topic):
+def main(filename, topic):
     rss_feeds = {
         "MarketWatch": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
         "WS-Market-News": "https://feeds.content.dowjones.io/public/rss/RSSMarketsMain",
@@ -66,7 +66,7 @@ def main(topic):
     if len(positives) == 0 and len(negatives) == 0 and len(neutrals) == 0:
         print("No new data for now")
     else:
-        with open("report.txt", "a") as file:
+        with open(filename, "a") as file:
             file.write("Report for " + topic + "\nPositive news\n")
             for news in positives:
                 file.write(news + "\n")
@@ -79,4 +79,7 @@ def main(topic):
             file.write("\nOverall score: " + str(score / num_news) + "\n\n")
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    if len(sys.argv) < 3:
+        print("Usage: python app.py <output_filename> <topic>")
+        sys.exit(1)
+    main(sys.argv[1], sys.argv[2])
