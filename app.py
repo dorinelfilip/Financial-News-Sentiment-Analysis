@@ -2,6 +2,7 @@ import sys
 from transformers import BertForSequenceClassification, BertTokenizer
 import torch
 import feedparser
+import json
 
 model_path = "stefanstanescu03/fin-bert-sentiment-analysis-finetune-v1"
 model = BertForSequenceClassification.from_pretrained(model_path)
@@ -38,14 +39,9 @@ def main(filename, topic):
         "Investing-Crypto": "https://www.investing.com/rss/news_301.rss"
     }
 
-    score = 0
     num_news = 0
-
-    positives = []
-    negatives = []
-    neutrals = []
-
-    print("Searching...")
+    score = 0
+    response = {'topic': topic, 'positives': [], 'negatives': [], 'neutrals': [], 'overall_score': 0}
 
     for source, url in rss_feeds.items():
         print("Now analyzing " + source)
@@ -54,29 +50,20 @@ def main(filename, topic):
             if topic in entry.title:
                 predicted_sentiment = predict_sentiment(entry.title)
                 num_news += 1
-                if predicted_sentiment == 'positive' and entry.title not in positives:
-                    positives.append(entry.title + " - " + source + "\nlink: " + entry.link + "\n")
+                if predicted_sentiment == 'positive' and entry.title not in response['positives']:
+                    response['positives'].append({'headline': entry.title, 'source': source, 'link': entry.link})
                     score += 1
-                elif predicted_sentiment == 'negative' and entry.title not in negatives:
-                    negatives.append(entry.title + " - " + source + "\nlink: " + entry.link + "\n")
+                elif predicted_sentiment == 'negative' and entry.title not in response['negatives']:
+                    response['negatives'].append({'headline': entry.title, 'source': source, 'link': entry.link})
                     score -= 1
-                elif entry.title not in neutrals:
-                    neutrals.append(entry.title + " - " + source + "\nlink: " + entry.link + "\n")
+                elif entry.title not in response['neutrals']:
+                    response['neutrals'].append({'headline': entry.title, 'source': source, 'link': entry.link})
+    
+    if num_news != 0:
+        response['overall_score'] = score / num_news
 
-    if len(positives) == 0 and len(negatives) == 0 and len(neutrals) == 0:
-        print("No new data for now")
-    else:
-        with open(filename, "a") as file:
-            file.write("Report for " + topic + "\nPositive news\n")
-            for news in positives:
-                file.write(news + "\n")
-            file.write("\nNegative news\n")
-            for news in negatives:
-                file.write(news + "\n")
-            file.write("\nNeutral news\n")
-            for news in neutrals:
-                file.write(news + "\n")
-            file.write("\nOverall score: " + str(score / num_news) + "\n\n")
+    with open(filename, "w") as f:
+        json.dump(response, f, indent=4)
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:

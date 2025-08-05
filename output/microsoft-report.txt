@@ -1,12 +1,13 @@
-Report for Microsoft
-Positive news
-
-Negative news
-Microsoft Is an AI Darling, but Its Core Businesses Are Booming Too - WS-Market-News
-link: https://www.wsj.com/tech/ai/microsoft-is-an-ai-darling-but-its-core-businesses-are-booming-too-2213126f?mod=rss_markets_main
-
-
-Neutral news
-
-Overall score: -1.0
-
+{
+    "topic": "Microsoft",
+    "positives": [],
+    "negatives": [
+        {
+            "headline": "Microsoft Is an AI Darling, but Its Core Businesses Are Booming Too",
+            "source": "WS-Market-News",
+            "link": "https://www.wsj.com/tech/ai/microsoft-is-an-ai-darling-but-its-core-businesses-are-booming-too-2213126f?mod=rss_markets_main"
+        }
+    ],
+    "neutrals": [],
+    "overall_score": -1.0
+}
