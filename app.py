@@ -1,29 +1,14 @@
-import sys 
+from fastapi import FastAPI
 from transformers import BertForSequenceClassification, BertTokenizer
 import torch
 import feedparser
-import json
 
 model_path = "stefanstanescu03/fin-bert-sentiment-analysis-finetune-v1"
 model = BertForSequenceClassification.from_pretrained(model_path)
 
 tokenizer = BertTokenizer.from_pretrained('yiyanghkust/finbert-pretrain')
 
-def predict_sentiment(input_text):
-    inputs = tokenizer(input_text, return_tensors="pt", truncation=True, padding=True)
-
-    with torch.no_grad():
-        outputs = model(**inputs)
-
-    predicted_label = torch.argmax(outputs.logits, dim=1).item()
-
-    label_map = {0: 'negative', 1: 'neutral', 2: 'positive'}
-    predicted_sentiment = label_map[predicted_label]
-
-    return predicted_sentiment
-
-def main(filename, topic):
-    rss_feeds = {
+rss_feeds = {
         "MarketWatch": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
         "WS-Market-News": "https://feeds.content.dowjones.io/public/rss/RSSMarketsMain",
         "WS-US-Business": "https://feeds.content.dowjones.io/public/rss/WSJcomUSBusiness",
@@ -39,12 +24,27 @@ def main(filename, topic):
         "Investing-Crypto": "https://www.investing.com/rss/news_301.rss"
     }
 
+
+def predict_sentiment(input_text):
+    inputs = tokenizer(input_text, return_tensors="pt", truncation=True, padding=True)
+
+    with torch.no_grad():
+        outputs = model(**inputs)
+
+    predicted_label = torch.argmax(outputs.logits, dim=1).item()
+
+    label_map = {0: 'negative', 1: 'neutral', 2: 'positive'}
+    predicted_sentiment = label_map[predicted_label]
+
+    return predicted_sentiment
+
+
+def handle_search(topic):
     num_news = 0
     score = 0
     response = {'topic': topic, 'positives': [], 'negatives': [], 'neutrals': [], 'overall_score': 0}
 
     for source, url in rss_feeds.items():
-        print("Now analyzing " + source)
         feed = feedparser.parse(url)
         for entry in feed.entries:
             if topic in entry.title:
@@ -61,12 +61,12 @@ def main(filename, topic):
     
     if num_news != 0:
         response['overall_score'] = score / num_news
+    return response
 
-    with open(filename, "w") as f:
-        json.dump(response, f, indent=4)
 
-if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print("Usage: python app.py <output_filename> <topic>")
-        sys.exit(1)
-    main(sys.argv[1], sys.argv[2])
+app = FastAPI()
+
+@app.get("/search/keyword={topic}")
+async def report(topic):
+    response = handle_search(topic)
+    return response

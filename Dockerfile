@@ -11,5 +11,6 @@ RUN python -c "from transformers import BertTokenizer, BertForSequenceClassifica
                BertForSequenceClassification.from_pretrained('stefanstanescu03/fin-bert-sentiment-analysis-finetune-v1')"
 
 COPY app.py .
+EXPOSE 8000
 
-ENTRYPOINT ["python", "app.py"]
+ENTRYPOINT ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
