@@ -1,12 +1,14 @@
 from fastapi import FastAPI
 from transformers import BertForSequenceClassification, BertTokenizer
+from contextlib import asynccontextmanager
 import torch
 import feedparser
 
-model_path = "stefanstanescu03/fin-bert-sentiment-analysis-finetune-v1"
-model = BertForSequenceClassification.from_pretrained(model_path)
+MODEL_PATH = "stefanstanescu03/fin-bert-sentiment-analysis-finetune-v1"
+TOKENIZER_PATH = 'yiyanghkust/finbert-pretrain'
 
-tokenizer = BertTokenizer.from_pretrained('yiyanghkust/finbert-pretrain')
+model = None
+tokenizer = None
 
 rss_feeds = {
         "MarketWatch": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
@@ -46,9 +48,12 @@ def handle_search(topic):
 
     for source, url in rss_feeds.items():
         feed = feedparser.parse(url)
+        print(source)
         for entry in feed.entries:
             if topic in entry.title:
                 predicted_sentiment = predict_sentiment(entry.title)
+                if hasattr(entry, 'description') and predicted_sentiment == 'neutral':
+                    predicted_sentiment = predict_sentiment(entry.description)
                 num_news += 1
                 if predicted_sentiment == 'positive' and entry.title not in response['positives']:
                     response['positives'].append({'headline': entry.title, 'source': source, 'link': entry.link})
@@ -64,7 +69,14 @@ def handle_search(topic):
     return response
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global model, tokenizer
+    model = BertForSequenceClassification.from_pretrained(MODEL_PATH)
+    tokenizer = BertTokenizer.from_pretrained(TOKENIZER_PATH)
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/search/keyword={topic}")
 async def report(topic):
