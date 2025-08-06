@@ -56,13 +56,16 @@ def handle_search(topic):
                     predicted_sentiment = predict_sentiment(entry.description)
                 num_news += 1
                 if predicted_sentiment == 'positive' and entry.title not in response['positives']:
-                    response['positives'].append({'headline': entry.title, 'source': source, 'link': entry.link})
+                    response['positives'].append({'headline': entry.title, 'source': source, 
+                                                  'date': entry.pubDate ,'link': entry.link})
                     score += 1
                 elif predicted_sentiment == 'negative' and entry.title not in response['negatives']:
-                    response['negatives'].append({'headline': entry.title, 'source': source, 'link': entry.link})
+                    response['positives'].append({'headline': entry.title, 'source': source, 
+                                                  'date': entry.pubDate ,'link': entry.link})
                     score -= 1
                 elif entry.title not in response['neutrals']:
-                    response['neutrals'].append({'headline': entry.title, 'source': source, 'link': entry.link})
+                    response['positives'].append({'headline': entry.title, 'source': source, 
+                                                  'date': entry.pubDate ,'link': entry.link})
     
     if num_news != 0:
         response['overall_score'] = score / num_news
