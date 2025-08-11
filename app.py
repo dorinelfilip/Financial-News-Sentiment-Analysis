@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from transformers import BertForSequenceClassification, BertTokenizer
-from contextlib import asynccontextmanager
+from contextlib2 import asynccontextmanager
 import torch
 import feedparser
 
@@ -57,15 +57,15 @@ def handle_search(topic):
                 num_news += 1
                 if predicted_sentiment == 'positive' and entry.title not in response['positives']:
                     response['positives'].append({'headline': entry.title, 'source': source, 
-                                                  'date': entry.pubDate ,'link': entry.link})
+                                                  'date': entry.published ,'link': entry.link})
                     score += 1
                 elif predicted_sentiment == 'negative' and entry.title not in response['negatives']:
-                    response['positives'].append({'headline': entry.title, 'source': source, 
-                                                  'date': entry.pubDate ,'link': entry.link})
+                    response['negatives'].append({'headline': entry.title, 'source': source, 
+                                                  'date': entry.published ,'link': entry.link})
                     score -= 1
                 elif entry.title not in response['neutrals']:
-                    response['positives'].append({'headline': entry.title, 'source': source, 
-                                                  'date': entry.pubDate ,'link': entry.link})
+                    response['neutrals'].append({'headline': entry.title, 'source': source, 
+                                                  'date': entry.published ,'link': entry.link})
     
     if num_news != 0:
         response['overall_score'] = score / num_news
