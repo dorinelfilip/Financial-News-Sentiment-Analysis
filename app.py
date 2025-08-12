@@ -23,7 +23,9 @@ rss_feeds = {
         "Investing-Stocks-investing-ideas": "https://www.investing.com/rss/news_1065.rss",
         "Investing-Stocks": "https://www.investing.com/rss/news_25.rss",
         "Investing-Economy": "https://www.investing.com/rss/news_14.rss",
-        "Investing-Crypto": "https://www.investing.com/rss/news_301.rss"
+        "Investing-Crypto": "https://www.investing.com/rss/news_301.rss",
+        "Reuters-Financial": "https://ir.thomsonreuters.com/rss/news-releases.xml?items=15",
+        "Reuters-SEC": "https://ir.thomsonreuters.com/rss/sec-filings.xml?items=15"
     }
 
 
