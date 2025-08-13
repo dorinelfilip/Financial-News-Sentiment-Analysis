@@ -16,11 +16,22 @@ export default function InterestCard({
   deleteInterest,
   id,
   searchInterest,
-  notify
+  notify,
+  interests,
+  setInterests,
+  saveInterests,
 }) {
   const [isEnabled, setIsEnabled] = useState(notify);
 
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+  const toggleSwitch = () => {
+    setIsEnabled((previousState) => !previousState);
+
+    const updated = interests.map((interest) =>
+      interest.id === id ? { ...interest, notify: !interest.notify } : interest
+    );
+    setInterests(updated);
+    saveInterests(updated);
+  };
 
   return (
     <View style={styles.interestCardContainer}>

@@ -9,9 +9,7 @@ import {
 
 import SearchImage from "../assets/search.png";
 
-export default function SearchBar({submit}) {
-  const [topic, setTopic] = useState("");
-
+export default function SearchBar({ submit, topic, setTopic }) {
   return (
     <View style={styles.searchBarContainer}>
       <TextInput
@@ -36,7 +34,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   input: {
-    width: '85%',
+    width: "85%",
     height: 40,
     borderColor: "#FAF9EE",
     borderLeftWidth: 1,

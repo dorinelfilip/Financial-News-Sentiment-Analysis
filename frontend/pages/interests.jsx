@@ -3,17 +3,13 @@ import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import DragList from "react-native-draglist";
 import InterestCard from "../components/interestCard";
 
-export default function Interests({ searchInterest }) {
-  const [interests, setInterests] = useState([
-    { id: "1", topic: "Apple", notify: true},
-    { id: "2", topic: "Amazon", notify: true},
-    { id: "3", topic: "Microsoft", notify: false},
-    { id: "4", topic: "Europe", notify: true},
-    { id: "5", topic: "Stock market", notify: false},
-    { id: "6", topic: "Ukraine war", notify: true},
-    { id: "7", topic: "Bitcoin", notify: true},
-  ]);
-
+export default function Interests({
+  searchInterest,
+  interests,
+  setInterests,
+  handleDeleteInterest,
+  saveInterests,
+}) {
   const keyExtractor = (item) => item.id;
 
   const renderItem = ({ item, onDragStart, onDragEnd, isActive }) => {
@@ -31,6 +27,9 @@ export default function Interests({ searchInterest }) {
           id={item.id}
           searchInterest={searchInterest}
           notify={item.notify}
+          interests={interests}
+          setInterests={setInterests}
+          saveInterests={saveInterests}
         />
       </TouchableOpacity>
     );
@@ -40,11 +39,14 @@ export default function Interests({ searchInterest }) {
     const copy = [...interests];
     const [removed] = copy.splice(fromIndex, 1);
     copy.splice(toIndex, 0, removed);
-    setInterests(copy);
-  };
 
-  const handleDeleteInterest = (id) => {
-    setInterests((prev) => prev.filter((interest) => interest.id !== id));
+    const updated = copy.map((item, index) => ({
+      ...item,
+      id: index + 1,
+    }));
+
+    setInterests(updated);
+    saveInterests(updated);
   };
 
   return (
