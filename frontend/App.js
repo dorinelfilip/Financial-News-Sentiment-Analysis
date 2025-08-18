@@ -11,6 +11,8 @@ export default function App() {
   const [currPage, setCurrPage] = useState(0);
   const [topic, setTopic] = useState("");
   const [interests, setInterests] = useState([]);
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadInterests();
@@ -29,7 +31,6 @@ export default function App() {
     try {
       const jsonValue = await AsyncStorage.getItem("interests");
       if (jsonValue != null) {
-        // console.log(JSON.parse(jsonValue));
         setInterests(JSON.parse(jsonValue));
       }
     } catch (e) {
@@ -62,16 +63,45 @@ export default function App() {
     }
   };
 
-  const handleSubmit = (topic) => {
-    // fetch(`http://172.20.10.2:8000/search/keyword=${topic}`)
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error fetching data:", error);
-    //   });
-    console.log(topic);
+  const handleSubmit = async (topic) => {
+    setLoading(true);
+    fetch(`http://10.0.2.2:8000/search/keyword=${topic}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const parsedNews = [
+          ...data.negatives.map((item) => ({
+            headline: item.headline,
+            source: item.source,
+            date: item.date,
+            link: item.link,
+            sentiment: "Negative",
+          })),
+          ...data.neutrals.map((item) => ({
+            headline: item.headline,
+            source: item.source,
+            date: item.date,
+            link: item.link,
+            sentiment: "Neutral",
+          })),
+          ...data.positives.map((item) => ({
+            headline: item.headline,
+            source: item.source,
+            date: item.date,
+            link: item.link,
+            sentiment: "Positive",
+          })),
+        ];
+        const sotedNews = [...parsedNews].sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+        setNews(sotedNews);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
     setCurrPage(1);
   };
 
@@ -85,6 +115,8 @@ export default function App() {
             addInterest={handleAddInterest}
             topic={topic}
             interests={interests}
+            news={news}
+            loadingState={loading}
           />
         </View>
       ) : (
