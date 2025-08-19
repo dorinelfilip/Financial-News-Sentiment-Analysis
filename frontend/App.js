@@ -6,6 +6,7 @@ import NavBar from "./components/navBar";
 import News from "./pages/news";
 import Interests from "./pages/interests";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_URL } from "@env";
 
 export default function App() {
   const [currPage, setCurrPage] = useState(0);
@@ -65,7 +66,7 @@ export default function App() {
 
   const handleSubmit = async (topic) => {
     setLoading(true);
-    fetch(`http://10.0.2.2:8000/search/keyword=${topic}`)
+    fetch(`${API_URL}/search/keyword=${topic}`)
       .then((response) => response.json())
       .then((data) => {
         const parsedNews = [
